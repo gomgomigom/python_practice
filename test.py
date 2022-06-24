@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from requests import get
 import time
 
 
@@ -19,6 +20,12 @@ def set_chrome_driver():
     return driver
 
 
+def download(url, file_name):
+    with open(file_name, "wb") as file:
+        response = get(url)
+        file.write(response.content)
+
+
 driver = set_chrome_driver()
 
 
@@ -30,3 +37,7 @@ driver.implicitly_wait(3)
 driver.get_screenshot_as_file("naver_main_headless1.png")
 time.sleep(5)
 driver.quit()
+
+seqnum = 10000
+if __name__ == "__main__":
+    url = f"https://busan.scourt.go.kr/dcboard/new/DcNewsViewAction.work?seqnum={seqnum}&gubun=44&cbub_code=000410&searchWord=&pageIndex=1"
