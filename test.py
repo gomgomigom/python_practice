@@ -38,6 +38,14 @@ driver.get_screenshot_as_file("naver_main_headless1.png")
 time.sleep(5)
 driver.quit()
 
-seqnum = 10000
+javascript: download(
+    "1352768201699_095641.pdf", "2011%EB%93%9C%EB%8B%A80000.pdf"
+)
+javascript: download("1352769436651_101716.pdf", "2012%EB%82%9820162.pdf")
+
+ㅌseqnum = 10000
 if __name__ == "__main__":
     url = f"https://busan.scourt.go.kr/dcboard/new/DcNewsViewAction.work?seqnum={seqnum}&gubun=44&cbub_code=000410&searchWord=&pageIndex=1"
+    download(
+        url,
+    )
