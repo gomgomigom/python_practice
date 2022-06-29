@@ -11,6 +11,7 @@ import re
 import pandas as pd
 from tqdm import tqdm
 import pdfplumber
+import time
 
 
 def read_pdf(file_name):
@@ -49,7 +50,7 @@ def make_csv_file(body_content, file_name=None):
 
 empty_list = [{"seqnum": None}]
 error_list = [{"error": None, "seqnum": None}]
-for i in tqdm(range(1, 10001)):
+for i in tqdm(range(10001, 10101)):
     try:
         base_url = "https://busan.scourt.go.kr/dcboard/new/DcNewsViewAction.work?&gubun=44&cbub_code=000410&searchWord=&pageIndex=1"
         params = {"seqnum": i}
@@ -89,14 +90,17 @@ for i in tqdm(range(1, 10001)):
 
         if file_name is None:
             empty_list.append({"seqnum": i})
+            print(f"empty: {i}")
         else:
             make_csv_file(body_content, file_name)
     except Exception as error:
+        print(i)
+        print(error)
         error_list.append({"error": error, "seqnum": i})
 
 
-make_csv_file(empty_list, "empty_list.csv")
-make_csv_file(error_list, "error_list.csv")
+make_csv_file(empty_list, f"empty_list{int(time.time())}.csv")
+make_csv_file(error_list, f"error_list{int(time.time())}.csv")
 # In[18]:
 
 
