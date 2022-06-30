@@ -50,7 +50,7 @@ def make_csv_file(body_content, file_name=None):
 
 empty_list = [{"seqnum": None}]
 error_list = [{"error": None, "seqnum": None}]
-for i in tqdm(range(10001, 10101)):
+for i in tqdm(range(13001, 25001)):
     try:
         base_url = "https://busan.scourt.go.kr/dcboard/new/DcNewsViewAction.work?&gubun=44&cbub_code=000410&searchWord=&pageIndex=1"
         params = {"seqnum": i}

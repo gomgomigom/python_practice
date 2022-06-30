@@ -2,8 +2,8 @@ import pandas as pd
 import glob
 import os
 
-input_file = "./csv/"
-output_file = "./csv_merge/precedent.csv"
+input_file = ".//"
+output_file = "./empty_list/empty_list_merge.csv"
 
 allFile_list = glob.glob(os.path.join(input_file, "*.csv"))
 
