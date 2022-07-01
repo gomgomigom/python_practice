@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[68]:
-
-
 import requests
 import lxml
 from bs4 import BeautifulSoup

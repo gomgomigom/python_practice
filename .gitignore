@@ -16,3 +16,4 @@ test.html
 *.egg
 *.csvp
 *.zip
+warehouse/
