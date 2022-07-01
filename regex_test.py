@@ -5,32 +5,28 @@ from tqdm import tqdm
 df = pd.read_csv("./regex_tex.csv")
 
 df["년도"] = df["file_name"].str.extract(r"(\d{4})(?=[ㄱ-ㅎ|ㅏ-ㅣ|가-힣])")
-print(df)
+df["사건번호"] = df["file_name"].str.extract(r"(\d{4}[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]{1,2}\d{1,4})")
 df["구분"] = df["file_name"].str.extract(r"(?<=\d{4})([ㄱ-ㅎ|ㅏ-ㅣ|가-힣]{1,2})(?=\d)")
 print(df)
+df.to_csv("./warehouse/test.csv", index=False)
+print(df)
+df = pd.read_csv("./warehouse/test.csv")
 
-test_df = df[df["file_name"].str.contains(r"고정|고단|고합")]
+
+test_df = df[df["사건번호"].str.contains(r"고정|고단|고합", na=False)]
 print(test_df)
 
 
-def a_func(count):
-    def b_func(c_func):
-        print(f"{count} 번째 카운트입니다")
-        print("b_func")
-
-        def d_func():
-            print("d_func")
-            c_func()
-
-        return c_func
-
-    return b_func
+def column_add(file_name):
+    df = pd.read_csv(file_name)
+    df["사건번호"] = df["file_name"].str.extract(
+        r"(\d{4}[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]{1,2}\d{1,4})"
+    )
+    test_df = df[df["사건번호"].str.contains(r"고정|고단|고합", na=False)]
+    print(test_df)
+    test_df.to_csv("./warehouse/test.csv", index=False)
 
 
-@a_func(2)
-def e_func():
-    print("e_func")
-
-
-print("############")
-e_func()
+if __name__ == "__main__":
+    file_name = "./csv_merge/court.csv"
+    column_add(file_name)
