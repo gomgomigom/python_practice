@@ -11,7 +11,6 @@ import time
 # cur = conn.cursor(pymysql.cursors.DictCursor)
 # cur.execute("show databases")
 
-
 load_dotenv()
 page = 1
 KEY = os.environ.get("KEY")
