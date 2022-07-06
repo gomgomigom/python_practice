@@ -17,3 +17,5 @@ test.html
 *.csvp
 *.zip
 warehouse/
+*.txt
+*.jpg

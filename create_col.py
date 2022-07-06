@@ -6,7 +6,7 @@ regex = (
     .str.split(pat=r"피\s*고\s*인", n=1, expand=True)[0]
     .str.split(pat=r"\d{4}[가-힣]{1,2}\d{1,4}", n=1, expand=True)[1]
     .replace(
-        to_replace=r"[0-9]|\(병합\)|\,|고단|고정|고합|\(분리\)|[가나다라마바사]\.|\-",
+        to_replace=r"[0-9]|\(병합\)|\,|고단|고정|고합|\(분리\)|[가나다라마바사]\.|\-|○|\:|선고기일|\.",
         value="",
         regex=True,
     )
