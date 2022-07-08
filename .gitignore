@@ -19,3 +19,5 @@ test.html
 warehouse/
 *.txt
 *.jpg
+*.json
+*.png
