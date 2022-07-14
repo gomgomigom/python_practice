@@ -4,7 +4,7 @@ import os
 
 os.chdir(os.path.dirname(__file__))
 
-df = pd.read_csv("./test.csv")
+df = pd.read_csv("./test.csv", converters={"판례내용": pd.eval})
 print(df)
 
 df2 = df["사건번호"].str.findall(
@@ -49,6 +49,5 @@ print(df4)
 df["사건번호"] = df4
 print(df)
 
-
-for lis in df["판례내용"]:
-    print(type(lis))
+print(df[[True if len(i) == 1 else False for i in df["사건번호"].to_list()]])
+print([len(i) for i in df["판례내용"].to_list()])
