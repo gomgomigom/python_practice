@@ -55,7 +55,6 @@ df.to_csv("./test2.csv", index=False)
 #     except TypeError:
 #         return np.nan
 
-
 # print(df)
 # df3 = [try_join(l) for l in df["사건번호"]]
 # print(df3)
@@ -64,7 +63,6 @@ df.to_csv("./test2.csv", index=False)
 # x = []
 # for l in df["사건번호"]:
 #     x.append(try_join(l))
-
 
 # print(x)
 
@@ -77,7 +75,6 @@ df.to_csv("./test2.csv", index=False)
 #         return str(l).split(",")
 #     except TypeError:
 #         return np.nan
-
 
 # df4 = [try_split(l) for l in df["사건번호"]]
 # print(df4)
