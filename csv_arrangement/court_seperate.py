@@ -15,7 +15,8 @@ print([len(i) for i in df["file_name"].to_list()].count(1))
 print(len([len(i) for i in df["file_name"].to_list()]))
 print(max([len(i) for i in df["file_body"].to_list()]))
 df = df.drop(["url"], axis=1)
-
+print(df.columns)
+print("--------------------------------")
 
 df = df.rename(
     columns={
@@ -25,8 +26,14 @@ df = df.rename(
         "seqnum": "판례정보일련번호",
     }
 )
+print(df.columns)
+print("--------------------------------")
 df = df.assign(사건명="", 선고일자="", 판시사항="", 판결요지="", 참조조문="", 참조판례="", 비고="")
+print(df.columns)
+print("--------------------------------")
 add_col = ["사건명", "선고일자", "판시사항", "판결요지", "참조조문", "참조판례"]
+print(df.columns)
+print("--------------------------------")
 df = df[
     [
         "판례정보일련번호",
@@ -40,17 +47,21 @@ df = df[
         "참조판례",
         "판례내용",
         "비고",
+        "제목",
+        "내용",
     ]
 ]
+print(df.columns)
+print("--------------------------------")
 
 
 df["판례정보일련번호"] = df["판례정보일련번호"] + 50000000
 one_true_list = [True if len(i) == 1 else False for i in df["사건번호"].to_list()]
 sev_true_list = [True if len(i) > 1 else False for i in df["사건번호"].to_list()]
 df_one = df[one_true_list]
-print(df_one)
+# print(df_one)
 df_several = df[sev_true_list]
-print(df_several)
+# print(df_several)
 
 df_one.to_csv("../csv_merge/court_one.csv", index=False)
 df_several.to_csv("../csv_merge/court_several.csv", index=False)
