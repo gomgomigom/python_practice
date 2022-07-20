@@ -15,6 +15,7 @@ df_l_not_duplicate = [
 ]
 print(df_l_not_duplicate)
 print(df_l_not_duplicate.count(True))
+print(df_l_not_duplicate.count(False))
 
 df_local_not_duplicate = df_local[df_l_not_duplicate]
 
