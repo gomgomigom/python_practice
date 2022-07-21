@@ -90,5 +90,5 @@ df_crime_check = [
 ]
 df = df[df_crime_check]
 df["사건명"] = df.apply(remove_trash, axis=1)
-df["판례내용"] = df["판례내용"].str[2:-2]
+# df["판례내용"] = df["판례내용"].str[2:-2]
 df.to_csv("./test.csv", index=False)
