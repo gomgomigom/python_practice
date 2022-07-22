@@ -2,7 +2,9 @@ import pandas as pd
 import numpy as np
 import os
 import re
+from tqdm import tqdm
 
+tqdm.pandas()
 os.chdir(os.path.dirname(__file__))
 
 df = pd.read_csv("../csv_merge/court_one.csv")
@@ -31,12 +33,12 @@ def test(x):
         return x["사건번호"]
 
 
-df["사건번호"] = df.apply(test, axis=1)
+df["사건번호"] = df.progress_apply(test, axis=1)
 # df["사건번호"] = df["사건번호"].apply(test)
 print(df["사건번호"].isna().sum())
 
 
-df.to_csv("./test2.csv", index=False)
+df.to_csv("./test.csv", index=False)
 
 
 # df = pd.read_csv("./test.csv", converters={"판례내용": pd.eval})

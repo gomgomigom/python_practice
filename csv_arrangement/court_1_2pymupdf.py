@@ -27,6 +27,7 @@ def change_text(x):
         return f"❌{file_name} Error : {str(err)}"
 
 
-df["판례내용"] = df.progress_apply(change_text, axis=1)
-print(df)
-df.to_csv("./test3.csv", index=False)
+if __name__ == "__main__":
+    df["판례내용"] = df.progress_apply(change_text, axis=1)
+    print(df)
+    df.to_csv("./test3.csv", index=False)

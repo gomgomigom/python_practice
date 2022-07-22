@@ -1,12 +1,14 @@
 import pandas as pd
 import re
+import fitz
 import os
+from tqdm import tqdm
 
+tqdm.pandas()
 os.chdir(os.path.dirname(__file__))
 
 
-df = pd.read_csv("./지방법원_1_죄명추출_중복제거_고.csv")
-# df = pd.read_csv("./지방법원_1_죄명추출_중복제거_고.csv", nrows=1000, usecols=["사건번호", "사건명", "판례내용"])
+df = pd.read_csv("./지방_1_사건번호_중복제거_고.csv", converters={"file_name": pd.eval})
 
 with open("./crime_extract.txt", "r") as f:
     crime = f.read()
@@ -14,13 +16,17 @@ with open("./crime_extract.txt", "r") as f:
 with open("./crime_extract_배임뺌.txt", "r") as f:
     crime_BE = f.read()
 
+with open("./crime_extract.txt", "r") as file:
+    regex = file.read()
+
 print(crime)
 
 
 def remove_trash(text):
     result = text["사건명"]
     result = re.sub(r"\d*[가-힣]{1,3}\d*\(병합\)", "", result)
-    result = re.sub(r"\d+\(병합\)|\(각병합\)", "", result)
+    result = re.sub(r"\d+\(병합\)", "", result)
+    result = re.sub(r"\(각병합\)", "", result)
     result = re.sub(r"\d+[가-힣]{1,3}\d+", "", result)
     result = re.sub(r"[가나다라마바사아자차카타파하]\.", ", ", result)
     result = re.sub(r"[가나다라마바]\s", ", ", result)
@@ -28,19 +34,21 @@ def remove_trash(text):
     result = re.sub(r"(?<!\()\d+(?!세)", "", result)
     result = re.sub(r"결\s*과", "", result)
     result = re.sub(
-        r"○\s?죄명\s:|○|공소제기|\(우범자\)|배상명령신청|부착명령|\(분리\)|고정|고단|고합|\-", "", result
+        r"○\s?죄명\s:|○|공소제기|\(우범자\)|배상명령신청|부착명령|\(분리\)|고정|고단|고합|\-|\(병합, 분리\)",
+        "",
+        result,
     )
     result = re.sub(r"\{", "(", result)
     result = re.sub(r"\}", "(", result)
     result = re.sub(r"\s{1,}", "", result)
     result = re.sub(r",(?!\s?[가-힣])", "", result)
     result = result.strip()
-    result = re.sub(r"^·+|^\:|:$|\($|\(,\s|\[$", "", result)
+    result = re.sub(r"^·+|^\)|^\:|:$|\($|\(,\s|\[$", "", result)
     result = re.sub(r"^,", "", result)
     result = re.sub(r",", ", ", result)
     result = result.strip()
     if len(result) > 200:
-        result = "🔴긺확인필요 " + result
+        result = "❌확인필요❌" + result
     print("🥝" + str(text.name) + " " + str(len(result)) + " " + result)
     return result
 
@@ -51,19 +59,24 @@ def extract_crime(x):
         text = text.rsplit(x["사건번호"], maxsplit=1)[1].strip()
     except IndexError:
         try:
-            text = "❌사건번호없음" + x["판례내용"].split(x["사건번호"], maxsplit=1)[1][:400]
+            text = "❌사건번호❌" + x["판례내용"].split(x["사건번호"], maxsplit=1)[1][:400]
             text = re.split(r"피\s*고\s*인", maxsplit=1, string=text)[0]
         except IndexError:
-            text = "❌❌사건번호없음 파일도이상한듯" + text[:120]
+            text = "❌사건번호❌" + text[:120]
 
+    confirm = re.compile(
+        r"\(\)|1심|2심|■|□|▣|◆|◇|◈|▶|►|▷|▹|▪|▫|[며따있너될으었극내글는를데런없능게징a-zA-Z받월였옆빨압뒤했뻔함슴뜨렸찾\[\]]"
+    )
+    if bool(confirm.search(text)):
+        return "❌확인필요❌" + text[:120]
     if "한글인식불가" in text:
         print("🔥pdfOCR필요")
-        text = "🔥pdfOCR필요" + text[:120]
+        text = "❌pdfOCR필요❌" + text[:120]
         return text
     if len(text) > 120:
         if "배포를 금합니다" in text:
-            print("❌배포금지")
-            text = "❌배포금지" + text[:120]
+            print("❌배포금지❌")
+            text = "❌배포금지❌" + text[:120]
             return text
 
         else:
@@ -72,7 +85,7 @@ def extract_crime(x):
         return text
 
 
-df["사건명"] = df.apply(extract_crime, axis=1)
+df["사건명"] = df.progress_apply(extract_crime, axis=1)
 
 df_crime_BE = [
     True
@@ -84,11 +97,91 @@ df_crime_BE = [
 ]
 print(df_crime_BE)
 print(df_crime_BE.count(False))
+
 df = df[df_crime_BE]
 df_crime_check = [
     True if bool(re.search(crime, i)) else False for i in df["사건명"]
 ]
 df = df[df_crime_check]
-df["사건명"] = df.apply(remove_trash, axis=1)
+df["사건명"] = df.progress_apply(remove_trash, axis=1)
 # df["판례내용"] = df["판례내용"].str[2:-2]
-df.to_csv("./test.csv", index=False)
+
+
+def check_case(x):
+    text = x.판례내용[2:150]
+    case1 = re.compile(r"지 *방 *법 *원 *판 *결 *사 *건")
+    case2 = re.compile(r"지 *방 *법 *원 *.*?형 *사 *부 *판 *결")
+    case3 = re.compile(r"^사 *건 *\d+[가-힣]{1,3}\d+")
+    case4 = re.compile(r"지 *방 *법 *원 *.*?지 *원 *판 *결")
+    case5 = re.compile(r"^.{0,10}?지 *방 *법 *원")
+    case6 = re.compile(r"[며따있너될으었극내글는를데런없능게징a-zA-Z받월였옆빨압뒤했뻔함슴뜨렸찾]")
+    if bool(case1.search(text)):
+        return
+    if bool(case2.search(text)):
+        return
+    if bool(case3.search(text)):
+        return
+    if bool(case4.search(text)):
+        return
+    if bool(case6.search(x.사건명)):
+        return "x"
+    if bool(case5.search(text)):
+        return "x"
+    else:
+        return "e"
+
+
+df["case"] = df.apply(check_case, axis=1)
+# df = df[[True if i == "?" else False for i in df["비고"]]]
+
+
+def case_x_change_text(x):
+    file_name = x["file_name"][0]
+    if x["case"] == "x":
+        try:
+            with fitz.open(f"../pdf_hwp/{file_name}") as doc:
+                text = ""
+                for page in doc:
+                    text += re.sub(r"\n", "", page.get_text())
+                if len(text) < 100:
+                    return f"❌{file_name} 한글인식불가 ! RequiredOCR"
+                return text
+        except fitz.fitz.FileDataError as err:
+            print(err)
+            return f"❌{file_name} Error : {str(err)}"
+    else:
+        return x["판례내용"]
+
+
+df["판례내용"] = df.progress_apply(case_x_change_text, axis=1)
+df["사건명"] = df.progress_apply(extract_crime, axis=1)
+df["사건명"] = df.progress_apply(remove_trash, axis=1)
+
+df = df[
+    df["사건명"].str.contains(
+        rf"{regex}",
+        na=False,
+    )
+]
+
+
+df.to_csv(
+    "./test.csv",
+    index=False,
+    columns=[
+        "판례정보일련번호",
+        "사건명",
+        "사건번호",
+        "선고일자",
+        "법원명",
+        "판시사항",
+        "판결요지",
+        "참조조문",
+        "참조판례",
+        "판례내용",
+        "비고",
+        "제목",
+        "내용",
+        "case",
+    ],
+)

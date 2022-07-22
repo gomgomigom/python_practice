@@ -17,7 +17,6 @@ print(max([len(i) for i in df["file_body"].to_list()]))
 df = df.drop(["url"], axis=1)
 print(df.columns)
 print("--------------------------------")
-
 df = df.rename(
     columns={
         "file_name": "사건번호",
@@ -26,6 +25,9 @@ df = df.rename(
         "seqnum": "판례정보일련번호",
     }
 )
+
+df = df.assign(file_name=df["사건번호"])
+
 print(df.columns)
 print("--------------------------------")
 df = df.assign(사건명="", 선고일자="", 판시사항="", 판결요지="", 참조조문="", 참조판례="", 비고="")
@@ -49,6 +51,7 @@ df = df[
         "비고",
         "제목",
         "내용",
+        "file_name",
     ]
 ]
 print(df.columns)

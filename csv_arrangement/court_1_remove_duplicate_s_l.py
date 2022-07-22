@@ -1,12 +1,11 @@
 import pandas as pd
-import re
 import numpy as np
 import os
 
 os.chdir(os.path.dirname(__file__))
 
 df_supreme = pd.read_csv("./대법원_고_죄.csv")
-df_local = pd.read_csv("./지방법원_1_죄명추출.csv")
+df_local = pd.read_csv("./지방_1_사건번호.csv")
 
 supreme_case = df_supreme["사건번호"].to_list()
 
