@@ -65,7 +65,7 @@ def extract_crime(x):
             text = "❌사건번호❌" + text[:120]
 
     confirm = re.compile(
-        r"\(\)|1심|2심|■|□|▣|◆|◇|◈|▶|►|▷|▹|▪|▫|[며따있너될으었극내글는를데런없능게징a-zA-Z받월였옆빨압뒤했뻔함슴뜨렸찾\[\]]"
+        r"\(\)|1심|2심|■|□|▣|◆|◇|◈|▶|►|▷|▹|▪|▫|[며따있너될으었극값내글는를데런없능게징a-zA-Z받월였옆빨압뒤했뻔함슴뜨렸찾\[\]]"
     )
     if bool(confirm.search(text)):
         return "❌확인필요❌" + text[:120]
@@ -110,19 +110,19 @@ df["사건명"] = df.progress_apply(remove_trash, axis=1)
 def check_case(x):
     text = x.판례내용[2:150]
     case1 = re.compile(r"지 *방 *법 *원 *판 *결 *사 *건")
-    case2 = re.compile(r"지 *방 *법 *원 *.*?형 *사 *부 *판 *결")
+    case2 = re.compile(r"지 *방 *법 *원 *.{0,10}?형 *사 *부 *판 *결")
     case3 = re.compile(r"^사 *건 *\d+[가-힣]{1,3}\d+")
     case4 = re.compile(r"지 *방 *법 *원 *.*?지 *원 *판 *결")
     case5 = re.compile(r"^.{0,10}?지 *방 *법 *원")
     case6 = re.compile(r"[며따있너될으었극내글는를데런없능게징a-zA-Z받월였옆빨압뒤했뻔함슴뜨렸찾]")
     if bool(case1.search(text)):
-        return
+        return "1"
     if bool(case2.search(text)):
-        return
+        return "2"
     if bool(case3.search(text)):
-        return
+        return "3"
     if bool(case4.search(text)):
-        return
+        return "4"
     if bool(case6.search(x.사건명)):
         return "x"
     if bool(case5.search(text)):
@@ -138,17 +138,21 @@ df["case"] = df.apply(check_case, axis=1)
 def case_x_change_text(x):
     file_name = x["file_name"][0]
     if x["case"] == "x":
+        li = []
         try:
             with fitz.open(f"../pdf_hwp/{file_name}") as doc:
                 text = ""
                 for page in doc:
                     text += re.sub(r"\n", "", page.get_text())
                 if len(text) < 100:
-                    return f"❌{file_name} 한글인식불가 ! RequiredOCR"
-                return text
+                    text = f"❌{file_name} 한글인식불가 ! RequiredOCR"
+            li.append(text)
+            return str(li)
         except fitz.fitz.FileDataError as err:
             print(err)
-            return f"❌{file_name} Error : {str(err)}"
+            text = f"❌{file_name} Error : {str(err)}"
+            li.append(text)
+            return str(li)
     else:
         return x["판례내용"]
 
