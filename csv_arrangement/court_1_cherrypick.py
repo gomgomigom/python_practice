@@ -8,7 +8,7 @@ with open("./crime_extract.txt", "r") as file:
     regex = file.read()
 
 
-df = pd.read_csv("./지방_1_사건명.csv")
+df = pd.read_csv("../csv_merge/지방_1_수동.csv")
 
 df = df[
     df["사건명"].str.contains(

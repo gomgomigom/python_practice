@@ -47,7 +47,7 @@ def remove_trash(text):
     result = re.sub(r"^,", "", result)
     result = re.sub(r",", ", ", result)
     result = result.strip()
-    if len(result) > 200:
+    if len(result) > 350:
         result = "❌확인필요❌" + result
     print("🥝" + str(text.name) + " " + str(len(result)) + " " + result)
     return result
@@ -62,21 +62,21 @@ def extract_crime(x):
             text = "❌사건번호❌" + x["판례내용"].split(x["사건번호"], maxsplit=1)[1][:400]
             text = re.split(r"피\s*고\s*인", maxsplit=1, string=text)[0]
         except IndexError:
-            text = "❌사건번호❌" + text[:120]
+            text = "❌사건번호❌" + text[:400]
 
     confirm = re.compile(
         r"\(\)|1심|2심|■|□|▣|◆|◇|◈|▶|►|▷|▹|▪|▫|[며따있너될으었극값내글는를데런없능게징a-zA-Z받월였옆빨압뒤했뻔함슴뜨렸찾\[\]]"
     )
     if bool(confirm.search(text)):
-        return "❌확인필요❌" + text[:120]
+        return "❌확인필요❌" + text[:400]
     if "한글인식불가" in text:
         print("🔥pdfOCR필요")
-        text = "❌pdfOCR필요❌" + text[:120]
+        text = "❌pdfOCR필요❌" + text[:400]
         return text
-    if len(text) > 120:
+    if len(text) > 300:
         if "배포를 금합니다" in text:
             print("❌배포금지❌")
-            text = "❌배포금지❌" + text[:120]
+            text = "❌배포금지❌" + text[:400]
             return text
 
         else:
@@ -114,7 +114,7 @@ def check_case(x):
     case3 = re.compile(r"^사 *건 *\d+[가-힣]{1,3}\d+")
     case4 = re.compile(r"지 *방 *법 *원 *.*?지 *원 *판 *결")
     case5 = re.compile(r"^.{0,10}?지 *방 *법 *원")
-    case6 = re.compile(r"[며따있너될으었극내글는를데런없능게징a-zA-Z받월였옆빨압뒤했뻔함슴뜨렸찾]")
+    case6 = re.compile(r"[며따있너될으었극내글는를데런없값능게징a-zA-Z받월였옆빨압뒤했뻔함슴뜨렸찾]")
     if bool(case1.search(text)):
         return "1"
     if bool(case2.search(text)):
