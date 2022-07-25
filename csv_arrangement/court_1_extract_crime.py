@@ -3,6 +3,7 @@ import re
 import fitz
 import os
 from tqdm import tqdm
+import pdfplumber
 
 tqdm.pandas()
 os.chdir(os.path.dirname(__file__))
@@ -12,10 +13,8 @@ df = pd.read_csv("./지방_1_사건번호_중복제거_고.csv", converters={"fi
 
 with open("./crime_extract.txt", "r") as f:
     crime = f.read()
-
 with open("./crime_extract_배임뺌.txt", "r") as f:
     crime_BE = f.read()
-
 with open("./crime_extract.txt", "r") as file:
     regex = file.read()
 
@@ -140,10 +139,26 @@ def case_x_change_text(x):
     if x["case"] == "x":
         li = []
         try:
-            with fitz.open(f"../pdf_hwp/{file_name}") as doc:
+            with pdfplumber.open(f"../pdf_hwp/{file_name}") as pdf:
+                doc = pdf.pages
                 text = ""
                 for page in doc:
-                    text += re.sub(r"\n", "", page.get_text())
+                    left = page.crop(
+                        (
+                            0,
+                            0,
+                            0.5 * float(page.width),
+                            1 * float(page.height),
+                        )
+                    )
+                    right = page.crop(
+                        0.5 * float(page.width),
+                        0,
+                        1 * float(page.width),
+                        1 * float(page.height),
+                    )
+                    text += re.sub(r"\n", "", left.get_text())
+                    text += re.sub(r"\n", "", right.get_text())
                 if len(text) < 100:
                     text = f"❌{file_name} 한글인식불가 ! RequiredOCR"
             li.append(text)
