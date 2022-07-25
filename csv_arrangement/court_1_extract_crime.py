@@ -46,7 +46,7 @@ def remove_trash(text):
     result = re.sub(r"^,", "", result)
     result = re.sub(r",", ", ", result)
     result = result.strip()
-    if len(result) > 350:
+    if len(result) > 500:
         result = "❌확인필요❌" + result
     print("🥝" + str(text.name) + " " + str(len(result)) + " " + result)
     return result
@@ -58,16 +58,16 @@ def extract_crime(x):
         text = text.rsplit(x["사건번호"], maxsplit=1)[1].strip()
     except IndexError:
         try:
-            text = "❌사건번호❌" + x["판례내용"].split(x["사건번호"], maxsplit=1)[1][:400]
+            text = "❌사건번호❌" + x["판례내용"].split(x["사건번호"], maxsplit=1)[1][:500]
             text = re.split(r"피\s*고\s*인", maxsplit=1, string=text)[0]
         except IndexError:
             text = "❌사건번호❌" + text[:400]
 
     confirm = re.compile(
-        r"\(\)|1심|2심|■|□|▣|◆|◇|◈|▶|►|▷|▹|▪|▫|[며따있너될으었극값내글는를데런없능게징a-zA-Z받월였옆빨압뒤했뻔함슴뜨렸찾\[\]]"
+        r"\(\)|1심|2심|■|□|▣|◆|◇|◈|▶|►|▷|▹|▪|▫|[며따있너될으었극값내글는를데런없능게징a-zA-Z받월였옆빨압뒤했뻔함슴뜨렸찾]"
     )
     if bool(confirm.search(text)):
-        return "❌확인필요❌" + text[:400]
+        return "❌확인필요❌" + text
     if "한글인식불가" in text:
         print("🔥pdfOCR필요")
         text = "❌pdfOCR필요❌" + text[:400]
@@ -111,20 +111,32 @@ def check_case(x):
     case1 = re.compile(r"지 *방 *법 *원 *판 *결 *사 *건")
     case2 = re.compile(r"지 *방 *법 *원 *.{0,10}?형 *사 *부 *판 *결")
     case3 = re.compile(r"^사 *건 *\d+[가-힣]{1,3}\d+")
+    case3_1 = re.compile(r"판결요지서")
+    case3_2 = re.compile(r"보도자료")
+    case3_3 = re.compile(r"한 사례|본 사례|2006고단141|한 판결")
     case4 = re.compile(r"지 *방 *법 *원 *.*?지 *원 *판 *결")
     case5 = re.compile(r"^.{0,10}?지 *방 *법 *원")
-    case6 = re.compile(r"[며따있너될으었극내글는를데런없값능게징a-zA-Z받월였옆빨압뒤했뻔함슴뜨렸찾]")
+    case6 = re.compile(r"[며따있너될으었내글데런없값능게징받월였옆빨압뒤했뻔함슴뜨렸찾는를극]")
+    case7 = re.compile(r"사위가 판사를")
     if bool(case1.search(text)):
         return "1"
     if bool(case2.search(text)):
         return "2"
     if bool(case3.search(text)):
         return "3"
+    if bool(case3_1.search(text)):
+        return "3_1"
+    if bool(case3_2.search(text)):
+        return "3_2"
+    if bool(case3_3.search(text)):
+        return "3_3"
     if bool(case4.search(text)):
         return "4"
     if bool(case6.search(x.사건명)):
         return "x"
     if bool(case5.search(text)):
+        return "x"
+    if bool(case6.search(text)):
         return "x"
     else:
         return "e"
@@ -152,18 +164,20 @@ def case_x_change_text(x):
                         )
                     )
                     right = page.crop(
-                        0.5 * float(page.width),
-                        0,
-                        1 * float(page.width),
-                        1 * float(page.height),
+                        (
+                            0.5 * float(page.width),
+                            0,
+                            1 * float(page.width),
+                            1 * float(page.height),
+                        )
                     )
-                    text += re.sub(r"\n", "", left.get_text())
-                    text += re.sub(r"\n", "", right.get_text())
+                    text += re.sub(r"\n", "", left.extract_text())
+                    text += re.sub(r"\n", "", right.extract_text())
                 if len(text) < 100:
                     text = f"❌{file_name} 한글인식불가 ! RequiredOCR"
             li.append(text)
             return str(li)
-        except fitz.fitz.FileDataError as err:
+        except AttributeError as err:
             print(err)
             text = f"❌{file_name} Error : {str(err)}"
             li.append(text)
@@ -202,5 +216,6 @@ df.to_csv(
         "제목",
         "내용",
         "case",
+        "file_name",
     ],
 )
