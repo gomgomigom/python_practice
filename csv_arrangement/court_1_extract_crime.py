@@ -111,33 +111,24 @@ def check_case(x):
     case1 = re.compile(r"지 *방 *법 *원 *판 *결 *사 *건")
     case2 = re.compile(r"지 *방 *법 *원 *.{0,10}?형 *사 *부 *판 *결")
     case3 = re.compile(r"^사 *건 *\d+[가-힣]{1,3}\d+")
-    case3_1 = re.compile(r"판결요지서")
-    case3_2 = re.compile(r"보도자료")
-    case3_3 = re.compile(r"한 사례|본 사례|2006고단141|한 판결")
     case4 = re.compile(r"지 *방 *법 *원 *.*?지 *원 *판 *결")
     case5 = re.compile(r"^.{0,10}?지 *방 *법 *원")
-    case6 = re.compile(r"[며따있너될으었내글데런없값능게징받월였옆빨압뒤했뻔함슴뜨렸찾는를극]")
-    case7 = re.compile(r"사위가 판사를")
+    case6 = re.compile(r"판결요지서")
+    case7 = re.compile(r"보도자료")
     if bool(case1.search(text)):
         return "1"
-    if bool(case2.search(text)):
+    elif bool(case2.search(text)):
         return "2"
-    if bool(case3.search(text)):
+    elif bool(case3.search(text)):
         return "3"
-    if bool(case3_1.search(text)):
-        return "3_1"
-    if bool(case3_2.search(text)):
-        return "3_2"
-    if bool(case3_3.search(text)):
-        return "3_3"
-    if bool(case4.search(text)):
+    elif bool(case4.search(text)):
         return "4"
-    if bool(case6.search(x.사건명)):
-        return "x"
-    if bool(case5.search(text)):
-        return "x"
-    if bool(case6.search(text)):
-        return "x"
+    elif bool(case5.search(text)):
+        return "5"
+    elif bool(case6.search(text)):
+        return "6"
+    elif bool(case7.search(text)):
+        return "7"
     else:
         return "e"
 

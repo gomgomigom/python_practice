@@ -12,13 +12,25 @@ def read_pdf(file_name):
     check_pdf = re.compile(r".*\.pdf")
     if re.match(check_pdf, file_name) is None:
         return None
-    with pdfplumber.open(f"./pdf_hwp/{file_name}") as pdf:
-        pages = pdf.pages
-        text = ""
-        for page in pages:
-            text += re.sub(r"\n", "", page.extract_text())
-        if len(text) < 10:
-            text = f"{file_name} 한글인식불가 ! RequiredOCR"
+    try:
+        with pdfplumber.open(f"./pdf_hwp/{file_name}") as pdf:
+            pages = pdf.pages
+            text = ""
+            for page in pages:
+                if page.width > page.height:
+                    left = page.crop((0, 0, 0.5 * page.width, page.height))
+                    right = page.crop(
+                        (0.5 * page.width, 0, page.width, page.height)
+                    )
+                    text += re.sub(r"\n", "", left.extract_text())
+                    text += re.sub(r"\n", "", right.extract_text())
+                else:
+                    text += re.sub(r"\n", "", page.extract_text())
+            if len(text) < 100:
+                text = f"❌{file_name} 한글인식불가 ! RequiredOCR"
+    except AttributeError as err:
+        print(err)
+        text = f"❌{file_name} Error : {str(err)}"
     return text
 
 
