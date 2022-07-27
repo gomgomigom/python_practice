@@ -1,3 +1,4 @@
+import pdfminer
 import requests
 import lxml
 from bs4 import BeautifulSoup
@@ -13,24 +14,29 @@ def read_pdf(file_name):
     if re.match(check_pdf, file_name) is None:
         return None
     try:
-        with pdfplumber.open(f"./pdf_hwp/{file_name}") as pdf:
+        with pdfplumber.open(f"../pdf_hwp/{file_name}") as pdf:
             pages = pdf.pages
             text = ""
             for page in pages:
-                if page.width > page.height:
-                    left = page.crop((0, 0, 0.5 * page.width, page.height))
-                    right = page.crop(
-                        (0.5 * page.width, 0, page.width, page.height)
-                    )
-                    text += re.sub(r"\n", "", left.extract_text())
-                    text += re.sub(r"\n", "", right.extract_text())
-                else:
-                    text += re.sub(r"\n", "", page.extract_text())
-            if len(text) < 100:
-                text = f"❌{file_name} 한글인식불가 ! RequiredOCR"
-    except AttributeError as err:
-        print(err)
-        text = f"❌{file_name} Error : {str(err)}"
+                try:
+                    if page.width > page.height:
+                        left = page.crop((0, 0, 0.5 * page.width, page.height))
+                        right = page.crop(
+                            (0.5 * page.width, 0, page.width, page.height)
+                        )
+                        text += re.sub(r"\n", "", left.extract_text())
+                        text += re.sub(r"\n", "", right.extract_text())
+                    else:
+                        text += re.sub(r"\n", "", page.extract_text())
+                except AttributeError as err1:
+                    text = f"❌ Error1 {file_name} : {str(err1)}"
+                    print(text)
+            if len(text) < 9:
+                text = f"❌ Error2 {file_name} 한글인식불가 ! RequiredOCR"
+                print(text)
+    except pdfminer.pdfparser.PDFSyntaxError as err3:
+        text = f"❌ Error3 {file_name} : {str(err3)}"
+        print(text)
     return text
 
 

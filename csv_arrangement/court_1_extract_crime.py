@@ -134,51 +134,6 @@ def check_case(x):
 
 
 df["case"] = df.apply(check_case, axis=1)
-# df = df[[True if i == "?" else False for i in df["비고"]]]
-
-
-def case_x_change_text(x):
-    file_name = x["file_name"][0]
-    if x["case"] == "x":
-        li = []
-        try:
-            with pdfplumber.open(f"../pdf_hwp/{file_name}") as pdf:
-                doc = pdf.pages
-                text = ""
-                for page in doc:
-                    left = page.crop(
-                        (
-                            0,
-                            0,
-                            0.5 * float(page.width),
-                            1 * float(page.height),
-                        )
-                    )
-                    right = page.crop(
-                        (
-                            0.5 * float(page.width),
-                            0,
-                            1 * float(page.width),
-                            1 * float(page.height),
-                        )
-                    )
-                    text += re.sub(r"\n", "", left.extract_text())
-                    text += re.sub(r"\n", "", right.extract_text())
-                if len(text) < 100:
-                    text = f"❌{file_name} 한글인식불가 ! RequiredOCR"
-            li.append(text)
-            return str(li)
-        except AttributeError as err:
-            print(err)
-            text = f"❌{file_name} Error : {str(err)}"
-            li.append(text)
-            return str(li)
-    else:
-        return x["판례내용"]
-
-
-df["판례내용"] = df.progress_apply(case_x_change_text, axis=1)
-df["사건명"] = df.progress_apply(extract_crime, axis=1)
 df["사건명"] = df.progress_apply(remove_trash, axis=1)
 
 df = df[
