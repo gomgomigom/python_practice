@@ -24,10 +24,10 @@ def read_pdf(file_name):
                         right = page.crop(
                             (0.5 * page.width, 0, page.width, page.height)
                         )
-                        text += re.sub(r"\n", "", left.extract_text())
-                        text += re.sub(r"\n", "", right.extract_text())
+                        text += left.extract_text()
+                        text += right.extract_text()
                     else:
-                        text += re.sub(r"\n", "", page.extract_text())
+                        text += page.extract_text()
                 except AttributeError as err1:
                     text = f"❌ Error1 {file_name} : {str(err1)}"
                     print(text)

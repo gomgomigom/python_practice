@@ -15,6 +15,7 @@ with open(
                 .replace(")", "\)")
                 .replace("∙", "∙?.?")
             )
+            text = rf"\b{text}\b"
             if line_num == 1:
                 crime += text
             crime += "|" + text
