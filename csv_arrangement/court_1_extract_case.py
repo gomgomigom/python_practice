@@ -7,7 +7,7 @@ from tqdm import tqdm
 tqdm.pandas()
 os.chdir(os.path.dirname(__file__))
 
-df = pd.read_csv("../csv_merge/court_one.csv")
+df = pd.read_csv("../csv_merge/court_1.csv")
 
 df["사건번호"] = df["사건번호"].str.extract(r"(\d{4}[가-힣]{1,3}\d+)")
 df["사건번호"] = df["사건번호"].fillna(np.nan)
@@ -16,10 +16,10 @@ df["사건번호"] = df["사건번호"].fillna(np.nan)
 def test(x):
     if x["사건번호"] is np.nan:
         try:
-            result = re.search(r"(\d+[가-힣]{1,3}\d+)", x["판례내용"]).group(1)
+            result = re.search(r"\b(\d+[가-힣]{1,3}\d+)\b", x["판례내용"]).group(1)
         except AttributeError:
             try:
-                result = re.search(r"(\d+[가-힣]{1,3})", x["판례내용"]).group(1)
+                result = re.search(r"\b(\d+[가-힣]{1,3})", x["판례내용"]).group(1)
                 print(x.name)
                 print(x["판례내용"][:70])
             except AttributeError:

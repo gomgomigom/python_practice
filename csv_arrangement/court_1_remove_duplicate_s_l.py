@@ -5,7 +5,7 @@ import os
 os.chdir(os.path.dirname(__file__))
 
 df_supreme = pd.read_csv("./대법원_고_죄.csv")
-df_local = pd.read_csv("./지방_1_사건번호.csv")
+df_local = pd.read_csv("../csv_merge/court_1_.csv")
 
 supreme_case = df_supreme["사건번호"].to_list()
 

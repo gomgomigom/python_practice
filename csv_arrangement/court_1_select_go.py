@@ -4,7 +4,7 @@ import os
 
 os.chdir(os.path.dirname(__file__))
 
-df = pd.read_csv("./지방_1_사건번호_중복제거.csv")
+df = pd.read_csv("../csv_merge/court_1_go.csv")
 
 df = df[df["사건번호"].str.contains(r"고정|고단|고합", na=False)]
 print(df)
